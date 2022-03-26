@@ -18,6 +18,7 @@ from librosa import display
 from librosa.feature import spectral_flatness, zero_crossing_rate
 
 
+
 #%% import an audio signal
 
 fs, x = wavfile.read(r'/Users/garimasharma/Downloads/Texture analysis/Sample audio texture files/McDermott_Simoncelli_2011_168_Sound_Textures/Natural/Fire1.wav')
@@ -37,6 +38,7 @@ wav_data = np.fromstring(data, 'int16')
 import librosa
 
 y, sr = librosa.load('/Users/garimasharma/Downloads/Texture analysis/Sample audio texture files/McDermott_Simoncelli_2011_168_Sound_Textures/Natural/Fire1.wav')
+duration = librosa.get_duration(y,sr)  # durartion of the signal
 
 #%% plot the original signal 
 
@@ -108,3 +110,30 @@ s_flatness = spectral_flatness(y)
 #%% zero crossing rate
 
 zero_rate = zero_crossing_rate(y)
+
+
+#%% STFT on an audio signal 
+
+y_freq_domain = librosa.stft(y,n_fft=512, hop_length=256)
+
+y_fft_abs = np.abs(y_freq_domain)
+
+# display a spectrogtam
+
+fig, ax = plt.subplots()
+img = librosa.display.specshow(librosa.amplitude_to_db(y_fft_abs,ref=np.max),y_axis='log', x_axis='time', ax=ax)
+ax.set_title('Power spectrogram')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
+
+#%% constant Q transform
+
+y_cqt = librosa.cqt(y, sr, hop_length=512, n_bins=35, bins_per_octave=10)
+y_cqt_abs = np.abs(y_cqt)
+
+fig, ax = plt.subplots()
+
+img = librosa.display.specshow(librosa.amplitude_to_db(y_cqt_abs, ref=np.max),sr=sr, x_axis='time', y_axis='cqt_note', ax=ax)
+ax.set_title('Constant Q transform')
+fig.colorbar(img, ax=ax, format="%+2.0f dB")
+
+#%% 
